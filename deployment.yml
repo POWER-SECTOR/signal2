@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: dpr-nginx
+spec:
+ replicas: 3
+ strategy:
+  type: Recreate
+ selector:
+  matchLabels:
+   dpr: dprnginx
+ template:
+  metadata:
+   name: dprnginx-pod
+   labels:
+    dpr: dprnginx
+  spec:
+   containers:
+     - name: dprnginx-c1
+       image: nginx:1.7.9
+       ports:
+       - containerPort: 80
+---
+# nodeIP- it is a service used for to access our pod from outside the cluster
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodeportip-fordpr
+spec:
+  selector:
+   dpr: dprnginx
+  type: NodePort
+  ports:
+  - name: nginx-port
+    port: 80
+    targetPort: 80
+    nodePort: 30015
